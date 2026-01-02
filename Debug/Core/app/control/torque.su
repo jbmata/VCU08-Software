@@ -1,0 +1,2 @@
+../Core/app/control/torque.c:5:12:clamp_int	24	static
+../Core/app/control/torque.c:12:6:torque_step	64	static

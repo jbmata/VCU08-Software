@@ -20,8 +20,12 @@
 #include "main.h"
 #include "cmsis_os.h"
 
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+//#include "app/state/inverter_sm.h"
+#include "inverter_sm.h"
+#include "app.h"
 
 /* USER CODE END Includes */
 
@@ -66,6 +70,9 @@ const osThreadAttr_t defaultTask_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
+static inverter_sm_state_t g_inv_sm = {
+    .current = INV_STATE_BOOT
+};
 
 /* USER CODE END PV */
 
@@ -86,6 +93,37 @@ static void MX_USB_OTG_HS_PCD_Init(void);
 void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
+/* --------- Estado lógico persistente --------- */
+static app_state_t app_state;
+
+static inverter_sm_state_t inv_sm = {
+    .current = INV_STATE_BOOT
+};
+
+static inverter_sm_outputs_t inv_sm_out;
+
+/* --------- Variables reales (HAL / CAN / GPIO) --------- */
+/* Estas YA EXISTEN en tu proyecto, aquí solo se usan */
+extern int s1_aceleracion;
+extern int s2_aceleracion;
+extern int s_freno;
+extern float v_celda_min;
+
+extern int inv_dc_bus_voltage;
+extern int precarga_inv;
+extern uint8_t state;              // estado CAN del inversor
+extern int start_button_act;
+
+
+int s1_aceleracion = 0;
+int s2_aceleracion = 0;
+int s_freno = 0;
+float v_celda_min = 4000.0f;
+
+int inv_dc_bus_voltage = 0;
+int precarga_inv = 0;
+uint8_t state = 0;
+int start_button_act = 0;
 
 /* USER CODE END PFP */
 
@@ -180,13 +218,92 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  /* ===== INVERTER STATE MACHINE ===== */
+
+	  /* 1) Construir inputs (USA TUS VARIABLES REALES) */
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
   }
   /* USER CODE END 3 */
 }
 
+static void inverter_send_precharge(void)
+{
+    /* TODO Fase C: CAN precarga */
+}
+
+static void inverter_set_ready(void)
+{
+    /* TODO Fase C: RX_SETPOINT READY */
+}
+
+static void inverter_send_torque(uint16_t torque)
+{
+    (void)torque;
+    /* TODO Fase C: CAN 0x362 */
+}
+
+static void inverter_shutdown(void)
+{
+    /* TODO Fase C: RX_SETPOINT shutdown */
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim != &htim16) return;
+
+    /* ---------------- APP INPUTS ---------------- */
+    app_inputs_t app_in = {
+        .accel1_raw = s1_aceleracion,
+        .accel2_raw = s2_aceleracion,
+        .brake_raw  = s_freno,
+        .v_cell_min = v_celda_min,
+        .now_ms     = HAL_GetTick(),
+    };
+
+    app_outputs_t app_out;
+
+    /* Ejecutar lógica de aplicación (torque + safety) */
+    app_step(&app_in, &app_state, &app_out);
+
+    /* ---------------- INVERTER SM INPUTS ---------------- */
+    inverter_sm_inputs_t inv_in = {
+        .hv_ok           = (inv_dc_bus_voltage > 60),
+        .precharge_done  = (precarga_inv == 1),
+        .inverter_ok     = (state == 4 || state == 6),
+        .start_button    = (start_button_act == 1),
+        .fault_present   = (state == 10 || state == 11),
+    };
+
+    /* Ejecutar máquina de estados del inversor */
+    inverter_sm_step(&inv_in, &inv_sm, &inv_sm_out);
+
+    /* ---------------- BRIDGE: aplicar outputs ---------------- */
+
+    if (inv_sm_out.enable_precharge) {
+        inverter_send_precharge();
+    }
+
+    if (inv_sm_out.enable_inverter) {
+        inverter_set_ready();
+    }
+
+    if (inv_sm_out.allow_torque) {
+        inverter_send_torque(app_out.torque_cmd);
+    } else {
+        inverter_send_torque(0);
+    }
+
+    if (inv_sm_out.request_shutdown) {
+        inverter_shutdown();
+    }
+
+
+}
 /**
   * @brief System Clock Configuration
   * @retval None

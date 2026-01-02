@@ -1,0 +1,2 @@
+../Core/app/state/inverter_sm.c:3:13:push_setpoint	16	static
+../Core/app/state/inverter_sm.c:10:6:inverter_sm_step	16	static

@@ -11,12 +11,13 @@ static int clamp_int(int v, int lo, int hi)
 
 void torque_step(const app_inputs_t *in, app_state_t *st, app_outputs_t *out)
 {
-    // 1) Convert raw sensors to percent (keep formulas aligned with legacy code)
-    int s1_pct = (int)((in->accel1_raw - 2050) / (29.5 - 20.5));
-    int s2_pct = (int)((in->accel2_raw - 1915) / (25.70 - 19.15));
 
-    s1_pct = clamp_int(s1_pct, 0, 100);
-    s2_pct = clamp_int(s2_pct, 0, 100);
+    float s1f = (in->accel1_raw - 2050.0f) / (29.5f - 20.5f);
+    float s2f = (in->accel2_raw - 1915.0f) / (25.70f - 19.15f);
+
+    int s1_pct = clamp_int((int)s1f, 0, 100);
+    int s2_pct = clamp_int((int)s2f, 0, 100);
+
 
     // 2) Average if both above small threshold
     int torque_total;
@@ -47,7 +48,7 @@ void torque_step(const app_inputs_t *in, app_state_t *st, app_outputs_t *out)
     }
 
     // Clamp again after scaling (defensive; keep 0..100)
-    torque_total = clamp_int(torque_total, 0, 100);
+    //torque_total = clamp_int(torque_total, 0, 100);
 
     // 6) Legacy scaling + two's complement for inverter command
     int scaled = torque_total;
