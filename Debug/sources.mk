@@ -28,6 +28,10 @@ Core/app \
 Core/app/control \
 Core/app/safety \
 Core/app/state \
+Core/services/can \
+Core/services/control \
+Core/services/inverter \
+Core/services/io \
 Drivers/STM32H7xx_HAL_Driver/Src \
 Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 \
 Middlewares/Third_Party/FreeRTOS/Source \

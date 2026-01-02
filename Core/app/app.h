@@ -1,8 +1,8 @@
 #pragma once
 
-#include "model/inputs.h"
-#include "model/outputs.h"
-#include "model/state.h"
+#include "inputs.h"
+#include "outputs.h"
+#include "state.h"
 
 /**
  * @brief One deterministic application step.

@@ -55,6 +55,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
+ ../Core/Inc/adc.h ../Core/Inc/main.h ../Core/Inc/fdcan.h \
+ ../Core/Inc/sdmmc.h ../Core/Inc/spi.h ../Core/Inc/tim.h \
+ ../Core/Inc/usart.h ../Core/Inc/usb_otg.h ../Core/Inc/gpio.h \
  ../Core/Inc/inverter_sm.h ../Core/Inc/app.h ../Core/Inc/inputs.h \
  ../Core/Inc/state.h ../Core/Inc/outputs.h
 ../Core/Inc/main.h:
@@ -114,6 +117,15 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
+../Core/Inc/adc.h:
+../Core/Inc/main.h:
+../Core/Inc/fdcan.h:
+../Core/Inc/sdmmc.h:
+../Core/Inc/spi.h:
+../Core/Inc/tim.h:
+../Core/Inc/usart.h:
+../Core/Inc/usb_otg.h:
+../Core/Inc/gpio.h:
 ../Core/Inc/inverter_sm.h:
 ../Core/Inc/app.h:
 ../Core/Inc/inputs.h:

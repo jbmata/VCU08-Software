@@ -1,0 +1,2 @@
+../Core/services/control/control_service.c:15:6:control_service_init	16	static
+../Core/services/control/control_service.c:26:6:control_service_step	56	static
